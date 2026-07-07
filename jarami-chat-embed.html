@@ -397,7 +397,7 @@ async function applyResult(r){
   state.session.consecutiveNeedsHelp=r.consecutive_needs_help||0;
   state.session.lastZaramiReply=r.zarami_reply||'';
 
-  if(r.is_on_topic===false){say('오, 그것도 궁금하다! 근데 지금은 잘 모르겠어. 방금 배운 거 다시 들려줄래? 🌱');return;}
+  if(r.is_on_topic===false){say(r.zarami_reply||'오, 그것도 궁금하다! 근데 지금은 잘 모르겠어. 방금 배운 거 다시 들려줄래? 🌱');return;}
 
   let p=activePet();
   const newNodes=r.newly_mastered_nodes||[];
