@@ -265,7 +265,7 @@ function paintScene(){
 }
 function startChatFresh(){ state.activePetId=null; $('talk').innerHTML=''; paintMe(); paintScene(); show('chat');
   say(`${state.user.nick}아, 반가워! 오늘은 무엇을 배웠는지 나한테 알려줄 수 있을까? 🌱`);
-  setTimeout(()=>say('아는 만큼 편하게 말해줘. 아래 예시를 눌러도 좋아!'),650);
+  setTimeout(()=>say('아는 만큼 편하게 말해줘.'),650);
 }
 function resumePet(id){ state.activePetId=id; const p=activePet(); $('talk').innerHTML=''; paintMe(); paintScene(); show('chat');
   state.expectedNode=NODE_ORDER.find(n=>!p.mastered.includes(n))||'def';
