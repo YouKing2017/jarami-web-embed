@@ -333,7 +333,8 @@ function evaluateLocal(text){
   return obj;
 }
 function parsedStudentGrade(){
-  const n=parseInt(state.user.grade,10);
+  const digits=String(state.user.grade).match(/\d+/);
+  const n=digits?parseInt(digits[0],10):NaN;
   return (Number.isInteger(n)&&n>=1&&n<=6)?n:null;
 }
 async function evaluateOnServer(text){
