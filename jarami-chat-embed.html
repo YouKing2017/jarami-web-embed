@@ -72,9 +72,6 @@
   @keyframes blink{0%,60%,100%{opacity:.25;}30%{opacity:1;}} @keyframes pop{from{opacity:0;transform:translateY(8px) scale(.96);}}
 
   .composer{padding:9px 16px 15px; border-top:1px solid var(--line); background:rgba(255,255,255,.55);}
-  .chips{display:flex; gap:7px; overflow-x:auto; padding-bottom:8px; scrollbar-width:none;} .chips::-webkit-scrollbar{display:none;}
-  .chip{flex:0 0 auto; font-size:12px; color:var(--leaf-deep); background:var(--leaf-soft); border:none; border-radius:100px; padding:7px 12px; cursor:pointer; white-space:nowrap;}
-  .chip .k{opacity:.6; font-size:10px;}
   .row{display:flex; gap:8px; align-items:flex-end;}
   textarea{flex:1; resize:none; font-size:15px; border:1.5px solid var(--line); border-radius:16px; padding:11px 13px; height:46px; max-height:110px; background:#fff; outline:none; font-family:var(--body);}
   textarea:focus{border-color:var(--jarami);}
@@ -145,7 +142,6 @@
     <div class="talk" id="talk"></div>
 
     <div class="composer">
-      <div class="chips" id="chips"></div>
       <div class="row">
         <textarea id="input" placeholder="오늘 배운 걸 자라미에게 알려주세요"></textarea>
         <button class="send" id="send">➤</button>
@@ -459,11 +455,6 @@ function showHint(id,text){
   $('overlay').classList.add('show');
 }
 $('hintClose').onclick=()=>{$('overlay').classList.remove('show');say('좋아, 이제 알 것 같아! 다시 알려줄래? 😃');$('input').focus();};
-
-/* ===== 데모 대본 (더미 데이터) ===== */
-const DEMO=[['광합성은 식물이 빛으로 양분을 만드는 거야','정의'],['잎에 있는 엽록체에서 일어나','장소'],['물이랑 이산화탄소가 필요해','재료'],['포도당이랑 산소가 만들어져','결과'],['밤엔 광합성을 못 하고 대신 숨을 쉬어(호흡)','밤'],['식물이 산소를 줘서 먹이사슬의 시작이야','의미']];
-$('chips').innerHTML=DEMO.map((d,i)=>`<button class="chip" data-i="${i}">${d[0]} <span class="k">· ${d[1]}</span></button>`).join('');
-$('chips').querySelectorAll('.chip').forEach(c=>c.onclick=()=>{$('input').value=DEMO[c.dataset.i][0];$('input').focus();});
 
 /* ===== 이벤트 ===== */
 $('send').onclick=teachAction;
