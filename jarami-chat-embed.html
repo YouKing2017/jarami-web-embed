@@ -202,6 +202,15 @@ const HINTS={
 const STAGES=['seed','sprout','seedling','leafy'];
 const STAGE_KR={seed:'씨앗',sprout:'새싹',seedling:'잎이 돋은',leafy:'잎이 무성한'};
 
+/* ===== API 설정 =====
+   api=1 로 열면 서버 프록시(/api/evaluate)를 통해 GPT 평가를 사용합니다.
+   API 키는 브라우저에 넣지 말고 server.mjs의 OPENAI_API_KEY 환경변수로만 전달하세요.
+*/
+const API_CONFIG={
+  enabled:['1','true','gpt'].includes((params.get('api')||'').toLowerCase()),
+  endpoint:params.get('apiEndpoint')||'/api/evaluate'
+};
+
 /* ===== 상태 (온보딩 값은 URL 파라미터로 주입, 없으면 기본값) ===== */
 const state={
   user:{
@@ -212,26 +221,14 @@ const state={
   me:{level:1,xp:0},
   pets:[],            // 대화로 태어난 펫들 (농장 보관)
   activePetId:null,   // 지금 대화 중인 펫
-  expectedNode:'def', useAPI:false, busy:false   // 더미 데이터 기반 로컬 평가만 사용
+  expectedNode:'def', useAPI:API_CONFIG.enabled, busy:false
 };
 const $=id=>document.getElementById(id);
 const activePet=()=>state.pets.find(p=>p.id===state.activePetId)||null;
 
 /* ===== 캐릭터 ===== */
 function jaramiSVG(size=110){
-  return `<svg width="${size}" height="${size}" viewBox="-58 -66 116 128" xmlns="http://www.w3.org/2000/svg">
-    <defs><radialGradient id="jg" cx="36%" cy="28%"><stop offset="0" stop-color="#BFD6FA"/><stop offset="1" stop-color="var(--jarami)"/></radialGradient></defs>
-    <ellipse cx="0" cy="52" rx="34" ry="9" fill="rgba(46,72,45,.10)"/>
-    <path d="M-3 -36 Q-14 -48 -6 -58 Q4 -50 2 -36Z" fill="var(--jarami-deep)"/>
-    <circle cx="-6" cy="-58" r="4" fill="var(--sun)"/>
-    <ellipse cx="0" cy="4" rx="37" ry="39" fill="url(#jg)"/>
-    <ellipse cx="-34" cy="16" rx="7" ry="11" fill="var(--jarami)"/>
-    <ellipse cx="34" cy="6" rx="7" ry="11" fill="var(--jarami)" transform="rotate(-18 34 6)"/>
-    <circle cx="-13" cy="-2" r="5" fill="#26324A"/><circle cx="13" cy="-2" r="5" fill="#26324A"/>
-    <circle cx="-11" cy="-4" r="1.7" fill="#fff"/><circle cx="15" cy="-4" r="1.7" fill="#fff"/>
-    <path d="M-8 11 Q0 18 8 11" stroke="#26324A" stroke-width="2.6" fill="none" stroke-linecap="round"/>
-    <circle cx="-21" cy="9" r="4.5" fill="#F49E86" opacity=".5"/><circle cx="21" cy="9" r="4.5" fill="#F49E86" opacity=".5"/>
-  </svg>`;
+  return `<img src="assets/jarami-character.gif" width="${size}" height="${size}" style="object-fit:contain;" alt="자라미" />`;
 }
 function petSVG(stage,size=150){
   const face=`<g><circle cx="-9" cy="-4" r="3.4" fill="#2C3A2E"/><circle cx="9" cy="-4" r="3.4" fill="#2C3A2E"/><circle cx="-8" cy="-5" r="1.1" fill="#fff"/><circle cx="10" cy="-5" r="1.1" fill="#fff"/><path d="M-6 5 Q0 10 6 5" stroke="#2C3A2E" stroke-width="2.2" fill="none" stroke-linecap="round"/><circle cx="-15" cy="3" r="3" fill="#F6B0A0" opacity=".6"/><circle cx="15" cy="3" r="3" fill="#F6B0A0" opacity=".6"/></g>`;
@@ -294,7 +291,7 @@ function renderFarm(){
   const add=$('addPlot'); if(add)add.onclick=startChatFresh;
 }
 
-/* ===== 평가 (더미 데이터 기반 로컬 평가) ===== */
+/* ===== 평가 ===== */
 function evaluateLocal(text){
   const p=activePet(); const mastered=p?p.mastered:[];
   const found=NODE_ORDER.filter(id=>!mastered.includes(id)&&NODES[id].keywords.some(k=>text.includes(k)));
@@ -308,7 +305,49 @@ function evaluateLocal(text){
   }
   return {result:obj,source:'💾 더미 데이터 평가'};
 }
-async function evaluate(text){ return evaluateLocal(text); }
+function normalizeEvaluation(value){
+  const fallback=evaluateLocal('').result;
+  const r=(value&&typeof value==='object')?value:{};
+  const mastered=Array.isArray(r.mastered_nodes)?r.mastered_nodes.filter(id=>NODES[id]):[];
+  const hint=NODES[r.suggested_hint_card]?r.suggested_hint_card:state.expectedNode;
+  return {
+    is_on_topic:r.is_on_topic!==false,
+    accuracy:['correct','partial','incorrect'].includes(r.accuracy)?r.accuracy:fallback.accuracy,
+    mastered_nodes:mastered,
+    feedback:typeof r.feedback==='string'&&r.feedback.trim()?r.feedback.trim():fallback.feedback,
+    follow_up_question:typeof r.follow_up_question==='string'?r.follow_up_question.trim():fallback.follow_up_question,
+    needs_help:Boolean(r.needs_help),
+    suggested_hint_card:hint
+  };
+}
+async function evaluateGPT(text){
+  const p=activePet();
+  const payload={
+    text,
+    user:state.user,
+    expectedNode:state.expectedNode,
+    masteredNodes:p?p.mastered:[],
+    nodes:Object.fromEntries(Object.entries(NODES).map(([id,n])=>[id,{concept:n.concept,keywords:n.keywords,followup:n.followup}]))
+  };
+  const response=await fetch(API_CONFIG.endpoint,{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify(payload)
+  });
+  const data=await response.json().catch(()=>({}));
+  if(!response.ok)throw new Error(data.error||'GPT 평가 서버 응답 오류');
+  return {result:normalizeEvaluation(data.result),source:data.source||'🤖 GPT 평가'};
+}
+async function evaluate(text){
+  if(!state.useAPI)return evaluateLocal(text);
+  try{
+    return await evaluateGPT(text);
+  }catch(err){
+    console.warn(err);
+    const local=evaluateLocal(text);
+    return {...local,source:'⚠️ GPT 연결 실패 · 더미 평가 사용'};
+  }
+}
 
 /* ===== 진행 ===== */
 async function teachAction(){
@@ -393,6 +432,7 @@ $('input').addEventListener('input',e=>{e.target.style.height='46px';e.target.st
 
 /* ===== 시작: 온보딩 없이 바로 대화 화면 ===== */
 startChatFresh();
+setStatus(state.useAPI?'GPT 평가 모드예요':'준비됐어요');
 </script>
 </body>
 </html>
