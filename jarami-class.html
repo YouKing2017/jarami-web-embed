@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>자라미 클래스 — 기관 대시보드</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Gaegu:wght@400;700&family=Gowun+Dodum&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-top:#E9F4E1; --bg-bot:#F8F3E5;
+    --ink:#2C3A2E; --muted:#7C8A78; --line:#E4EADC;
+    --leaf:#45A05F; --leaf-deep:#2E7A45; --leaf-soft:#CFEBD3;
+    --soil:#8A6239; --soil-deep:#5C3F27; --soil-soft:#E4CDA9;
+    --sun:#F5B740; --sun-deep:#E39412; --sun-soft:#FCEBC2;
+    --card:#FFFFFF; --jarami:#7BA8F0; --jarami-deep:#4E7FD6; --jarami-soft:#DCE8FC;
+    --danger:#E2745B; --danger-soft:#FBE3DC;
+    --shadow:0 10px 28px rgba(46,72,45,.08);
+    --disp:'Jua',sans-serif; --hand:'Gaegu',cursive; --body:'Gowun Dodum',sans-serif;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:var(--body); color:var(--ink); background:linear-gradient(170deg,var(--bg-top),var(--bg-bot)); min-height:100vh; -webkit-font-smoothing:antialiased;}
+  .app{display:flex; min-height:100vh;}
+
+  /* ===== 사이드바 ===== */
+  .side{width:230px; flex:0 0 230px; background:linear-gradient(175deg,#3E5A40,#2C3A2E); color:#fff; padding:26px 18px; display:flex; flex-direction:column; gap:4px;}
+  .side .logo{font-family:var(--disp); font-size:20px; margin-bottom:2px; display:flex; align-items:center; gap:8px;}
+  .side .sub{font-size:11px; color:#B7C9B4; margin-bottom:26px;}
+  .side a{display:flex; align-items:center; gap:10px; padding:11px 12px; border-radius:12px; color:#DDE8D9; text-decoration:none; font-size:14px; transition:.15s;}
+  .side a:hover{background:rgba(255,255,255,.08);}
+  .side a.on{background:var(--leaf); color:#fff; font-family:var(--disp); box-shadow:0 6px 16px rgba(69,160,95,.35);}
+  .side .spacer{flex:1;}
+  .side .org{font-size:11px; color:#9FB49B; border-top:1px solid rgba(255,255,255,.12); padding-top:14px; line-height:1.6;}
+  .side .org b{color:#fff; font-family:var(--disp); font-size:13px; display:block;}
+
+  /* ===== 메인 ===== */
+  main{flex:1; padding:30px 38px; overflow-x:hidden;}
+  .topline{display:flex; align-items:center; justify-content:space-between; margin-bottom:22px;}
+  .topline h1{font-family:var(--disp); font-size:24px;}
+  .topline .tag{font-size:12px; color:var(--muted); margin-top:3px;}
+  .who{display:flex; align-items:center; gap:9px; background:var(--card); border:1px solid var(--line); border-radius:100px; padding:6px 14px 6px 6px; box-shadow:var(--shadow);}
+  .who .r{width:30px;height:30px;border-radius:50%; background:linear-gradient(160deg,var(--jarami),var(--jarami-deep)); display:grid; place-items:center; color:#fff; font-family:var(--disp); font-size:13px;}
+  .who .t small{display:block; font-size:10px; color:var(--muted);}
+  .who .t b{font-size:13px;}
+
+  .stats{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:26px;}
+  .stat{background:var(--card); border:1px solid var(--line); border-radius:18px; padding:16px 18px; box-shadow:var(--shadow);}
+  .stat .l{font-size:12px; color:var(--muted);}
+  .stat .v{font-family:var(--disp); font-size:26px; margin-top:4px;}
+  .stat .v.leaf{color:var(--leaf-deep);} .stat .v.sun{color:var(--sun-deep);} .stat .v.jarami{color:var(--jarami-deep);}
+  .stat .d{font-size:11px; color:var(--muted); margin-top:2px;}
+
+  .grid2{display:grid; grid-template-columns:1.35fr 1fr; gap:18px; align-items:start;}
+  .panel{background:var(--card); border:1px solid var(--line); border-radius:20px; padding:20px 22px; box-shadow:var(--shadow); margin-bottom:18px;}
+  .panel h2{font-family:var(--disp); font-size:16px; margin-bottom:14px; display:flex; align-items:center; gap:7px;}
+  .panel h2 span.small{font-family:var(--body); font-size:11px; color:var(--muted); font-weight:normal; margin-left:auto;}
+
+  table{width:100%; border-collapse:collapse; font-size:13px;}
+  th{text-align:left; color:var(--muted); font-weight:normal; font-size:11px; padding:6px 8px; border-bottom:1px solid var(--line);}
+  td{padding:10px 8px; border-bottom:1px solid #F1F4EE; vertical-align:middle;}
+  tr:last-child td{border-bottom:none;}
+  .avatar{width:26px;height:26px;border-radius:50%;display:inline-grid;place-items:center;color:#fff;font-family:var(--disp);font-size:11px;margin-right:8px; vertical-align:middle;}
+  .pill{display:inline-block; font-size:11px; padding:3px 10px; border-radius:100px; font-family:var(--disp);}
+  .pill.a{background:var(--leaf-soft); color:var(--leaf-deep);}
+  .pill.b{background:var(--sun-soft); color:var(--sun-deep);}
+  .pill.c{background:var(--danger-soft); color:var(--danger);}
+  .pill.done{background:var(--leaf-soft); color:var(--leaf-deep);}
+  .pill.wait{background:#EEF0EC; color:var(--muted);}
+  .bar{width:70px; height:6px; background:var(--line); border-radius:100px; overflow:hidden; display:inline-block; vertical-align:middle;}
+  .bar i{display:block; height:100%; background:linear-gradient(90deg,var(--leaf),var(--leaf-deep));}
+
+  .assign-box{background:linear-gradient(160deg,#FFF7E4,var(--sun-soft)); border:1px solid #F0DDA6; border-radius:16px; padding:16px 18px; margin-bottom:14px;}
+  .assign-box .ti{font-family:var(--disp); font-size:14px; color:var(--sun-deep); margin-bottom:4px;}
+  .assign-box p{font-size:12px; color:#8A6A2E; line-height:1.5;}
+  .assign-box .prog{margin-top:10px; display:flex; align-items:center; gap:8px; font-size:12px; color:var(--sun-deep);}
+
+  .group-cards{display:flex; flex-direction:column; gap:10px;}
+  .gcard{border:1px solid var(--line); border-radius:14px; padding:12px 14px; display:flex; align-items:center; gap:12px;}
+  .gcard .dot{width:10px;height:10px;border-radius:50%; flex:0 0 auto;}
+  .gcard.a .dot{background:var(--leaf);} .gcard.b .dot{background:var(--sun);} .gcard.c .dot{background:var(--danger);}
+  .gcard .body{flex:1;}
+  .gcard .name{font-family:var(--disp); font-size:13px;}
+  .gcard .desc{font-size:11px; color:var(--muted); margin-top:2px; line-height:1.4;}
+  .gcard .n{font-family:var(--disp); font-size:20px; color:var(--ink);}
+
+  .ai-note{margin-top:14px; background:var(--jarami-soft); border-radius:14px; padding:12px 14px; font-size:12px; color:var(--jarami-deep); line-height:1.6;}
+  .ai-note b{font-family:var(--disp); font-size:12px;}
+
+  @media (max-width:980px){ .grid2{grid-template-columns:1fr;} .stats{grid-template-columns:repeat(2,1fr);} .side{display:none;} }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <aside class="side">
+    <div class="logo">🌱 자라미 클래스</div>
+    <div class="sub">기관 담당자용</div>
+    <a class="on" href="#">📊 대시보드</a>
+    <a href="#">🧒 원생 관리</a>
+    <a href="#">📝 숙제 관리</a>
+    <a href="#">🧩 그룹 분류</a>
+    <div class="spacer"></div>
+    <div class="org"><b>초록빛 지역아동센터</b>비즈니스 요금제 · 원생 24명</div>
+  </aside>
+
+  <main>
+    <div class="topline">
+      <div>
+        <h1>안녕하세요, 담당 선생님!</h1>
+        <div class="tag">오늘 원생들의 학습 현황을 확인해보세요.</div>
+      </div>
+      <div class="who">
+        <div class="r">담</div>
+        <div class="t"><small>초록빛 지역아동센터</small><b>김담당 선생님</b></div>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><div class="l">전체 원생</div><div class="v jarami">24명</div><div class="d">이번 학기 등록</div></div>
+      <div class="stat"><div class="l">이번주 숙제 완료</div><div class="v leaf">18 / 24</div><div class="d">75% 완료율</div></div>
+      <div class="stat"><div class="l">평균 이해도</div><div class="v sun">2.4 / 3</div><div class="d">지난주 대비 +0.3</div></div>
+      <div class="stat"><div class="l">펫 진화 완료</div><div class="v leaf">11명</div><div class="d">잎이 무성 단계 도달</div></div>
+    </div>
+
+    <div class="grid2">
+      <div>
+        <div class="panel">
+          <h2>🧒 원생 명부 <span class="small">최근 학습일 순</span></h2>
+          <table>
+            <tr><th>이름</th><th>학년</th><th>숙제</th><th>이해도</th><th>그룹</th></tr>
+            <tr><td><span class="avatar" style="background:#7BA8F0">도</span>도윤</td><td>초4</td><td><span class="pill done">완료</span></td><td><div class="bar"><i style="width:90%"></i></div></td><td><span class="pill a">그룹 A</span></td></tr>
+            <tr><td><span class="avatar" style="background:#F5B740">서</span>서아</td><td>초3</td><td><span class="pill done">완료</span></td><td><div class="bar"><i style="width:80%"></i></div></td><td><span class="pill a">그룹 A</span></td></tr>
+            <tr><td><span class="avatar" style="background:#45A05F">하</span>하은</td><td>초5</td><td><span class="pill wait">진행중</span></td><td><div class="bar"><i style="width:55%"></i></div></td><td><span class="pill b">그룹 B</span></td></tr>
+            <tr><td><span class="avatar" style="background:#E2745B">지</span>지호</td><td>초4</td><td><span class="pill wait">미완료</span></td><td><div class="bar"><i style="width:30%"></i></div></td><td><span class="pill c">그룹 C</span></td></tr>
+            <tr><td><span class="avatar" style="background:#7BA8F0">유</span>유나</td><td>초6</td><td><span class="pill done">완료</span></td><td><div class="bar"><i style="width:95%"></i></div></td><td><span class="pill a">그룹 A</span></td></tr>
+            <tr><td><span class="avatar" style="background:#8A6239">민</span>민준</td><td>초3</td><td><span class="pill wait">진행중</span></td><td><div class="bar"><i style="width:48%"></i></div></td><td><span class="pill b">그룹 B</span></td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div>
+        <div class="panel">
+          <h2>📝 이번 주 숙제</h2>
+          <div class="assign-box">
+            <div class="ti">🔬 과학 · 광합성</div>
+            <p>자라미에게 광합성에 대해 설명해주세요. (정의 → 장소 → 재료 → 결과물 → 밤의 변화)</p>
+            <div class="prog">18 / 24명 완료 <div class="bar" style="width:100px"><i style="width:75%;background:linear-gradient(90deg,var(--sun),var(--sun-deep))"></i></div></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h2>🧩 그룹 분류 대시보드 <span class="small">AI 자동 분류</span></h2>
+          <div class="group-cards">
+            <div class="gcard a"><div class="dot"></div><div class="body"><div class="name">그룹 A · 빠르게 이해하는 그룹</div><div class="desc">정답률 평균 85% 이상, 스스로 설명 잘함</div></div><div class="n">9명</div></div>
+            <div class="gcard b"><div class="dot"></div><div class="body"><div class="name">그룹 B · 힌트 카드가 필요한 그룹</div><div class="desc">되묻기에서 종종 막힘, 반복 설명 필요</div></div><div class="n">10명</div></div>
+            <div class="gcard c"><div class="dot"></div><div class="body"><div class="name">그룹 C · 설명이 짧은 그룹</div><div class="desc">프로테제 효과가 약함, 유도 필요</div></div><div class="n">5명</div></div>
+          </div>
+          <div class="ai-note"><b>💡 AI 추천</b><br>그룹 C 원생에게는 "빛은 어디로 갈까?" 같은 짧은 되묻기보다, 예시를 먼저 보여주는 힌트 카드를 우선 적용하는 것이 그룹 A 사례에서 효과적이었습니다.</div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

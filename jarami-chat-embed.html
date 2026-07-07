@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>자라미 — 대화 (임베드)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Gaegu:wght@400;700&family=Gowun+Dodum&display=swap" rel="stylesheet">
+<link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css" />
+<style>
+  :root{
+    --bg-top:#E9F4E1; --bg-bot:#F8F3E5;
+    --ink:#2C3A2E; --muted:#7C8A78; --line:#E4EADC;
+    --leaf:#45A05F; --leaf-deep:#2E7A45; --leaf-soft:#CFEBD3;
+    --soil:#8A6239; --soil-deep:#5C3F27; --soil-soft:#E4CDA9;
+    --sun:#F5B740; --sun-deep:#E39412; --sun-soft:#FCEBC2;
+    --card:#FFFFFF; --jarami:#7BA8F0; --jarami-deep:#4E7FD6; --jarami-soft:#DCE8FC;
+    --shadow:0 18px 44px rgba(46,72,45,.16);
+    --disp:'Jua',sans-serif; --hand:'Pretendard Variable','Pretendard',sans-serif; --body:'Pretendard Variable','Pretendard',sans-serif;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  html,body{height:100%;}
+  body{font-family:var(--body); color:var(--ink); background:linear-gradient(170deg,var(--bg-top),var(--bg-bot));
+    min-height:100dvh; -webkit-font-smoothing:antialiased;}
+  .device{width:100%; height:100dvh; background:linear-gradient(175deg,#F6FBF1,#FFFDF6);
+    overflow:hidden; position:relative; display:flex; flex-direction:column;}
+  .screen{display:none; flex-direction:column; height:100%;}
+  .screen.on{display:flex;}
+  button{font-family:inherit;}
+
+  /* ===== 공통 상단바 ===== */
+  .topbar{display:flex; align-items:center; gap:10px; padding:14px 16px 8px;}
+  .topbar .navbtn{height:34px; padding:0 12px; border-radius:100px; border:1px solid var(--line); background:#fff; font-size:13px; cursor:pointer; color:var(--ink); display:flex; align-items:center; gap:5px;}
+  .topbar .spacer{flex:1;}
+  .mepill{display:flex;align-items:center;gap:7px;background:#fff;border:1px solid var(--line);border-radius:100px;padding:5px 12px 5px 6px;}
+  .mepill .r{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-family:var(--disp);font-size:11px;color:#fff;background:linear-gradient(160deg,var(--sun),var(--sun-deep));}
+  .mepill .t{line-height:1.05;} .mepill .t .l{font-size:9px;color:var(--muted);} .mepill .t .v{font-family:var(--disp);font-size:12px;}
+
+  /* ===== 대화(메인) ===== */
+  #chat{background:linear-gradient(180deg,#EAF3FB 0%,#F1F6E9 55%,#FBF6E9 100%);}
+  .scene{position:relative; height:210px; margin:2px 10px 0; display:flex; align-items:flex-end; justify-content:center; gap:6px;}
+  .sun{position:absolute; top:0; right:16px; width:40px;height:40px;border-radius:50%; background:radial-gradient(circle at 40% 35%,#FFE79A,var(--sun));
+    box-shadow:0 0 0 7px rgba(245,183,64,.18),0 0 22px rgba(245,183,64,.5); animation:sunpulse 4s ease-in-out infinite;}
+  @keyframes sunpulse{50%{transform:scale(1.06);}}
+  .spot{position:relative; display:flex; flex-direction:column; align-items:center; justify-content:flex-end;}
+  .jarami-spot{transform-origin:bottom center; animation:float 3.6s ease-in-out infinite;}
+  @keyframes float{50%{transform:translateY(-6px);}}
+  .jarami-spot.think{animation:think 1s ease-in-out infinite;} @keyframes think{25%{transform:rotate(-4deg);}75%{transform:rotate(4deg);}}
+  .jarami-tag{font-family:var(--disp); font-size:12px; color:var(--jarami-deep); background:var(--jarami-soft); padding:2px 12px; border-radius:100px; margin-top:2px;}
+  .pet-spot{transform-origin:bottom center; animation:float 3.9s ease-in-out infinite .3s;}
+  .pet-spot.spawn{animation:spawn .9s cubic-bezier(.2,1.2,.3,1);}
+  @keyframes spawn{0%{transform:scale(0) translateY(20px);opacity:0;}60%{transform:scale(1.15);}100%{transform:scale(1);opacity:1;}}
+  .pet-tag{font-family:var(--disp); font-size:12px; color:var(--leaf-deep); background:var(--leaf-soft); padding:2px 12px; border-radius:100px; margin-top:2px;}
+  .empty-plot{width:120px;height:150px;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:6px;opacity:.7;}
+  .empty-plot .dash{width:74px;height:74px;border-radius:50%;border:2.5px dashed #BFCBB6;display:grid;place-items:center;font-size:24px;color:#BFCBB6;}
+  .empty-plot .cap{font-size:11px;color:var(--muted);text-align:center;}
+  .petleaves{display:flex; gap:4px; justify-content:center; margin-top:5px;}
+  .lf{width:18px;height:18px;border-radius:50% 50% 50% 0; transform:rotate(45deg); background:var(--line); display:grid;place-items:center; transition:.35s;}
+  .lf b{transform:rotate(-45deg); font-size:9px; color:#B9C4B4; font-family:var(--disp);}
+  .lf.on{background:radial-gradient(circle at 35% 30%,#8FD69A,var(--leaf)); box-shadow:0 3px 7px rgba(69,160,95,.35);}
+  .lf.on b{color:#fff;}
+
+  .talk{flex:1; overflow-y:auto; padding:10px 18px 4px; display:flex; flex-direction:column; gap:9px;}
+  .bubble{align-self:flex-start; max-width:86%; background:var(--card); border:1px solid var(--line); border-radius:18px 18px 18px 5px;
+    padding:10px 13px; box-shadow:0 6px 16px rgba(46,72,45,.07); font-family:var(--hand); font-size:20px; line-height:1.35; animation:pop .35s cubic-bezier(.2,1.2,.3,1);}
+  .bubble.me{align-self:flex-end; border-radius:18px 18px 5px 18px; background:linear-gradient(160deg,#FFF4D8,var(--sun-soft)); border-color:#F3DFA6; font-family:var(--body); font-size:15px;}
+  .bubble .q{color:var(--jarami-deep);}
+  .bubble.born{align-self:center; background:linear-gradient(160deg,#EAF7EC,var(--leaf-soft)); border-color:#B9E0BE; font-family:var(--disp); font-size:14px; color:var(--leaf-deep); text-align:center;}
+  .bubble.think{color:var(--muted);} .bubble.think .dots b{display:inline-block;animation:blink 1.2s infinite;}
+  .bubble.think .dots b:nth-child(2){animation-delay:.2s;} .bubble.think .dots b:nth-child(3){animation-delay:.4s;}
+  @keyframes blink{0%,60%,100%{opacity:.25;}30%{opacity:1;}} @keyframes pop{from{opacity:0;transform:translateY(8px) scale(.96);}}
+
+  .composer{padding:9px 16px 15px; border-top:1px solid var(--line); background:rgba(255,255,255,.55);}
+  .chips{display:flex; gap:7px; overflow-x:auto; padding-bottom:8px; scrollbar-width:none;} .chips::-webkit-scrollbar{display:none;}
+  .chip{flex:0 0 auto; font-size:12px; color:var(--leaf-deep); background:var(--leaf-soft); border:none; border-radius:100px; padding:7px 12px; cursor:pointer; white-space:nowrap;}
+  .chip .k{opacity:.6; font-size:10px;}
+  .row{display:flex; gap:8px; align-items:flex-end;}
+  textarea{flex:1; resize:none; font-size:15px; border:1.5px solid var(--line); border-radius:16px; padding:11px 13px; height:46px; max-height:110px; background:#fff; outline:none; font-family:var(--body);}
+  textarea:focus{border-color:var(--jarami);}
+  .send{flex:0 0 auto; width:46px;height:46px;border:none;border-radius:16px; cursor:pointer; background:linear-gradient(160deg,var(--jarami),var(--jarami-deep)); color:#fff; font-size:20px; box-shadow:0 6px 16px rgba(78,127,214,.35);}
+  .send:active{transform:scale(.94);} .send:disabled{opacity:.5;}
+  .toolbar{display:flex; align-items:center; justify-content:space-between; margin-top:8px;}
+  .status{font-size:11px;color:var(--muted);}
+
+  /* ===== 농장 ===== */
+  #farm{background:linear-gradient(180deg,#EAF5E4,#F6EFDC);}
+  .farm-title{padding:8px 22px 2px; font-family:var(--disp); font-size:16px; color:var(--soil-deep);}
+  .farm-sub{padding:0 22px 10px; font-size:11px; color:var(--muted);}
+  .plots{flex:1; overflow-y:auto; padding:4px 16px 20px; display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+  .plot{background:var(--card); border:1px solid var(--line); border-radius:20px; padding:14px 12px 12px; display:flex; flex-direction:column; align-items:center; cursor:pointer; box-shadow:0 6px 16px rgba(46,72,45,.06); transition:.15s; position:relative;}
+  .plot:active{transform:scale(.97);}
+  .plot .petbox{height:92px; display:grid; place-items:end center;}
+  .plot .fieldtag{position:absolute; top:10px; left:10px; font-size:10px; background:var(--jarami-soft); color:var(--jarami-deep); padding:2px 8px; border-radius:100px;}
+  .plot .topic{font-family:var(--disp); font-size:15px; margin-top:8px;}
+  .plot .st{font-size:11px; color:var(--muted); margin-top:1px;}
+  .plot .prog{display:flex; gap:3px; margin-top:6px;} .plot .prog i{width:6px;height:6px;border-radius:50%;background:var(--line);} .plot .prog i.on{background:var(--leaf);}
+  .plot .soil{width:100%; height:12px; background:linear-gradient(var(--soil-soft),var(--soil)); border-radius:0 0 12px 12px; margin-top:8px;}
+  .plot.add{border:2px dashed #CBD6C0; background:transparent; box-shadow:none; justify-content:center; color:var(--muted);}
+  .plot.add .plus{font-size:30px; color:#AEBBA2;} .plot.add .t{font-size:12px; margin-top:4px; text-align:center;}
+  .empty-farm{grid-column:1/3; text-align:center; color:var(--muted); font-size:13px; padding:30px 10px; line-height:1.6;}
+
+  /* ===== 오버레이 ===== */
+  .overlay{position:absolute; inset:0; background:rgba(28,44,30,.5); backdrop-filter:blur(3px); display:none; align-items:center; justify-content:center; padding:24px; z-index:20;}
+  .overlay.show{display:flex; animation:fade .25s;} @keyframes fade{from{opacity:0;}}
+  .hint{background:var(--card); border-radius:24px; padding:22px; width:100%; max-width:330px; text-align:center; box-shadow:var(--shadow); animation:pop .35s cubic-bezier(.2,1.2,.3,1);}
+  .hint .emo{font-size:44px;} .hint .tag{display:inline-block;font-size:11px;color:var(--sun-deep);background:var(--sun-soft);padding:4px 10px;border-radius:100px;margin-bottom:10px;}
+  .hint h3{font-family:var(--disp); font-size:19px; color:var(--leaf-deep); margin:6px 0 8px;} .hint p{font-size:14px; line-height:1.55;}
+  .hint button{margin-top:16px; width:100%; border:none; border-radius:14px; padding:13px; cursor:pointer; font-family:var(--disp); font-size:15px; color:#fff; background:linear-gradient(160deg,var(--sun),var(--sun-deep));}
+
+  .evo{position:absolute; inset:0; display:none; align-items:center; justify-content:center; z-index:30; flex-direction:column; text-align:center; background:radial-gradient(circle at center,rgba(255,240,200,.96),rgba(233,244,225,.98));}
+  .evo.show{display:flex;}
+  .evo .burst{position:absolute; width:300px;height:300px;border-radius:50%; background:radial-gradient(circle,rgba(245,183,64,.55),transparent 60%); animation:burst 1.6s ease-out;}
+  @keyframes burst{0%{transform:scale(.2);opacity:1;}100%{transform:scale(2.4);opacity:0;}}
+  .evo .ray{position:absolute;width:6px;height:150px;background:linear-gradient(var(--sun),transparent);left:50%;top:50%;transform-origin:top center;border-radius:6px;opacity:.75;animation:ray 1.5s ease-out;}
+  @keyframes ray{0%{height:0;opacity:0;}30%{opacity:.8;}100%{height:220px;opacity:0;}}
+  .evo .creature{position:relative;z-index:2;animation:rise 1.2s cubic-bezier(.2,1.1,.3,1);}
+  @keyframes rise{0%{transform:scale(.4) translateY(30px);opacity:0;}60%{transform:scale(1.12);}100%{transform:scale(1);opacity:1;}}
+  .evo .word{position:relative;z-index:2;font-family:var(--disp);font-size:30px;color:var(--sun-deep);margin-top:6px;text-shadow:0 2px 0 #fff;animation:pop .5s .3s backwards;}
+  .evo .sub{position:relative;z-index:2;font-family:var(--hand);font-size:21px;color:var(--leaf-deep);margin-top:2px;animation:pop .5s .5s backwards;}
+  .spark{position:absolute;width:9px;height:9px;background:#fff;border-radius:50%;box-shadow:0 0 8px var(--sun);animation:spk 1.4s ease-out forwards;}
+  @keyframes spk{0%{transform:scale(0);opacity:1;}100%{transform:scale(1.4) translateY(-50px);opacity:0;}}
+  .fin{align-self:center;text-align:center;font-family:var(--disp);color:var(--leaf-deep);font-size:15px;background:var(--leaf-soft);padding:9px 16px;border-radius:16px;margin-top:4px;}
+
+  @media (prefers-reduced-motion:reduce){*{animation:none!important; transition:none!important;}}
+</style>
+</head>
+<body>
+<div class="device">
+
+  <!-- ===== 대화 (메인 인터페이스) ===== -->
+  <section class="screen on" id="chat">
+    <div class="topbar">
+      <button class="navbtn" id="toFarm">🌾 농장</button>
+      <div class="spacer"></div>
+      <div class="mepill"><div class="r" id="meR">나</div><div class="t"><div class="l" id="meNick">나</div><div class="v" id="meLv">Lv.1</div></div></div>
+    </div>
+
+    <div class="scene">
+      <div class="sun"></div>
+      <div class="spot"><div class="jarami-spot" id="jaramiSpot"></div><div class="jarami-tag" id="jaramiTag">자라미</div></div>
+      <div class="spot" id="petSpot"></div>
+    </div>
+
+    <div class="talk" id="talk"></div>
+
+    <div class="composer">
+      <div class="chips" id="chips"></div>
+      <div class="row">
+        <textarea id="input" placeholder="오늘 배운 걸 자라미에게 알려주세요"></textarea>
+        <button class="send" id="send">➤</button>
+      </div>
+      <div class="toolbar">
+        <div class="status" id="status">준비됐어요</div>
+      </div>
+    </div>
+
+    <div class="overlay" id="overlay">
+      <div class="hint"><div class="emo" id="hintEmo">🌱</div><div class="tag">같이 찾아보기</div><h3 id="hintTitle"></h3><p id="hintText"></p><button id="hintClose">이거 보고 다시 알려줄게!</button></div>
+    </div>
+    <div class="evo" id="evo"><div class="burst"></div><div id="rays"></div><div class="creature" id="evoCreature"></div><div class="word" id="evoWord">진화!</div><div class="sub" id="evoSub"></div></div>
+  </section>
+
+  <!-- ===== 농장 ===== -->
+  <section class="screen" id="farm">
+    <div class="topbar">
+      <button class="navbtn" id="toChat">‹ 자라미에게</button>
+      <div class="spacer"></div>
+      <div class="mepill"><div class="r">나</div><div class="t"><div class="l" id="meNick2">나</div><div class="v" id="meLv2">Lv.1</div></div></div>
+    </div>
+    <div class="farm-title">🌾 나의 배움 농장</div>
+    <div class="farm-sub">자라미와 대화하며 태어난 펫들이에요. 눌러서 더 키워줄 수 있어요.</div>
+    <div class="plots" id="plots"></div>
+  </section>
+</div>
+
+<script>
+/* ===== FlexStudio 온보딩(Step1)에서 넘어온 값 (URL 파라미터) =====
+   예: jarami-chat-embed.html?jarami=자라미&nick=도윤&grade=초4 */
+const params=new URLSearchParams(location.search);
+
+/* ===== 지식 조각 (광합성) ===== */
+const NODES={
+  def:{concept:'식물이 빛으로 양분을 만든다',keywords:['광합성','양분','빛으로','만들','밥'],followup:'그 빛은 식물의 어디로 들어가는 거야?',words:['광합성'],cheer:'우와! 식물이 빛으로 밥을 만든다는 거지? 완전 신기해!'},
+  light:{concept:'빛이 에너지원',keywords:['빛','햇빛','에너지','태양'],followup:'빛이 없으면 어떻게 될까?',words:['햇빛'],cheer:'아하, 빛이 힘의 원천이구나!'},
+  place:{concept:'잎의 엽록체에서 일어남',keywords:['엽록체','엽록소','잎'],followup:'양분을 만들려면 빛 말고 또 뭐가 필요해?',words:['엽록체'],cheer:'엽록체! 그 어려운 말을 알려주다니, 고마워!'},
+  material:{concept:'재료는 물 + 이산화탄소',keywords:['물','이산화탄소'],followup:'그렇게 해서 뭐가 만들어져?',words:['이산화탄소'],cheer:'물이랑 이산화탄소가 재료구나!'},
+  product:{concept:'결과물은 포도당 + 산소',keywords:['포도당','산소'],followup:'그럼… 밤에는 어떻게 돼? 깜깜하면 양분 못 만들잖아?',words:['포도당','산소'],cheer:'포도당이랑 산소가 나오는구나! 대박!'},
+  night:{concept:'밤엔 광합성 X, 대신 호흡',keywords:['밤','호흡','숨','못'],followup:'이게 우리한테 왜 중요할까?',words:['호흡'],cheer:'밤엔 숨을 쉰다고?! 나 이제 진짜 다 알 것 같아!'},
+  world:{concept:'산소 공급·먹이사슬 기초',keywords:['먹이사슬','산소','지구','생명'],followup:'이제 너 광합성 박사다! 또 알려줄 거 있어?',words:['먹이사슬'],cheer:'그게 그렇게 소중한 거였어?!'}
+};
+const NODE_ORDER=Object.keys(NODES);
+const HINTS={
+  def:{emo:'☀️',title:'광합성이 뭐야?',text:'식물은 햇빛을 받아서 스스로 양분(밥)을 만들어요. 이걸 광합성이라고 불러요.'},
+  light:{emo:'💡',title:'빛의 역할',text:'광합성에는 빛 에너지가 꼭 필요해요. 빛이 없으면 양분을 만들 수 없어요.'},
+  place:{emo:'🍃',title:'어디서 일어날까?',text:'광합성은 잎 속의 "엽록체"라는 작고 초록색인 방에서 일어나요.'},
+  material:{emo:'💧',title:'무엇이 필요할까?',text:'재료는 뿌리로 빨아들인 "물"과, 잎으로 들어온 "이산화탄소"예요.'},
+  product:{emo:'🍬',title:'무엇이 만들어질까?',text:'광합성으로 "포도당"(양분)과 "산소"가 만들어져요. 산소는 공기 중으로 나가요.'},
+  night:{emo:'🌙',title:'낮과 밤의 식물',text:'낮엔 빛을 받아 광합성을 해요. 밤엔 빛이 없어 광합성을 못 하고, 대신 숨을 쉬어요(호흡).'},
+  world:{emo:'🌍',title:'왜 중요할까?',text:'식물이 내놓는 산소로 우리가 숨 쉬고, 식물은 먹이사슬의 시작점이에요.'}
+};
+const STAGES=['seed','sprout','seedling','leafy'];
+const STAGE_KR={seed:'씨앗',sprout:'새싹',seedling:'잎이 돋은',leafy:'잎이 무성한'};
+
+/* ===== 상태 (온보딩 값은 URL 파라미터로 주입, 없으면 기본값) ===== */
+const state={
+  user:{
+    nick:params.get('nick')||'친구',
+    grade:params.get('grade')||'',
+    jarami:params.get('jarami')||'자라미'
+  },
+  me:{level:1,xp:0},
+  pets:[],            // 대화로 태어난 펫들 (농장 보관)
+  activePetId:null,   // 지금 대화 중인 펫
+  expectedNode:'def', useAPI:false, busy:false   // 더미 데이터 기반 로컬 평가만 사용
+};
+const $=id=>document.getElementById(id);
+const activePet=()=>state.pets.find(p=>p.id===state.activePetId)||null;
+
+/* ===== 캐릭터 ===== */
+function jaramiSVG(size=110){
+  return `<svg width="${size}" height="${size}" viewBox="-58 -66 116 128" xmlns="http://www.w3.org/2000/svg">
+    <defs><radialGradient id="jg" cx="36%" cy="28%"><stop offset="0" stop-color="#BFD6FA"/><stop offset="1" stop-color="var(--jarami)"/></radialGradient></defs>
+    <ellipse cx="0" cy="52" rx="34" ry="9" fill="rgba(46,72,45,.10)"/>
+    <path d="M-3 -36 Q-14 -48 -6 -58 Q4 -50 2 -36Z" fill="var(--jarami-deep)"/>
+    <circle cx="-6" cy="-58" r="4" fill="var(--sun)"/>
+    <ellipse cx="0" cy="4" rx="37" ry="39" fill="url(#jg)"/>
+    <ellipse cx="-34" cy="16" rx="7" ry="11" fill="var(--jarami)"/>
+    <ellipse cx="34" cy="6" rx="7" ry="11" fill="var(--jarami)" transform="rotate(-18 34 6)"/>
+    <circle cx="-13" cy="-2" r="5" fill="#26324A"/><circle cx="13" cy="-2" r="5" fill="#26324A"/>
+    <circle cx="-11" cy="-4" r="1.7" fill="#fff"/><circle cx="15" cy="-4" r="1.7" fill="#fff"/>
+    <path d="M-8 11 Q0 18 8 11" stroke="#26324A" stroke-width="2.6" fill="none" stroke-linecap="round"/>
+    <circle cx="-21" cy="9" r="4.5" fill="#F49E86" opacity=".5"/><circle cx="21" cy="9" r="4.5" fill="#F49E86" opacity=".5"/>
+  </svg>`;
+}
+function petSVG(stage,size=150){
+  const face=`<g><circle cx="-9" cy="-4" r="3.4" fill="#2C3A2E"/><circle cx="9" cy="-4" r="3.4" fill="#2C3A2E"/><circle cx="-8" cy="-5" r="1.1" fill="#fff"/><circle cx="10" cy="-5" r="1.1" fill="#fff"/><path d="M-6 5 Q0 10 6 5" stroke="#2C3A2E" stroke-width="2.2" fill="none" stroke-linecap="round"/><circle cx="-15" cy="3" r="3" fill="#F6B0A0" opacity=".6"/><circle cx="15" cy="3" r="3" fill="#F6B0A0" opacity=".6"/></g>`;
+  let b='';
+  if(stage==='seed')b=`<g transform="translate(0,14)"><ellipse cx="0" cy="40" rx="34" ry="10" fill="rgba(46,72,45,.10)"/><path d="M0 -30 C26 -30 30 30 0 34 C-30 30 -26 -30 0 -30Z" fill="#C98B5A"/><path d="M0 -30 C18 -30 22 20 0 30 C-8 24 -12 -20 0 -30Z" fill="#E0A877"/><g transform="translate(0,-2)">${face}</g><path d="M0 -30 Q4 -44 12 -46" stroke="var(--leaf)" stroke-width="4" fill="none" stroke-linecap="round"/></g>`;
+  else if(stage==='sprout')b=`<g transform="translate(0,10)"><ellipse cx="0" cy="46" rx="38" ry="11" fill="rgba(46,72,45,.10)"/><rect x="-4" y="6" width="8" height="34" rx="4" fill="var(--leaf-deep)"/><path d="M2 14 Q34 6 40 -18 Q14 -12 2 14Z" fill="var(--leaf)"/><path d="M-2 18 Q-32 12 -40 -10 Q-16 -8 -2 18Z" fill="#5FB873"/><circle cx="0" cy="-6" r="26" fill="#7FC98A"/><g transform="translate(0,-4)">${face}</g></g>`;
+  else if(stage==='seedling')b=`<g transform="translate(0,4)"><ellipse cx="0" cy="54" rx="44" ry="12" fill="rgba(46,72,45,.10)"/><rect x="-5" y="8" width="10" height="46" rx="5" fill="var(--leaf-deep)"/><path d="M4 24 Q44 16 52 -14 Q18 -8 4 24Z" fill="var(--leaf)"/><path d="M-4 30 Q-46 22 -54 -6 Q-22 -4 -4 30Z" fill="#5FB873"/><path d="M3 10 Q30 -6 30 -30 Q8 -20 3 10Z" fill="#6DC17F"/><circle cx="0" cy="-14" r="30" fill="#8FD69A"/><g transform="translate(0,-12)">${face}</g></g>`;
+  else b=`<g transform="translate(0,0)"><ellipse cx="0" cy="60" rx="52" ry="13" fill="rgba(46,72,45,.10)"/><rect x="-6" y="6" width="12" height="56" rx="6" fill="var(--leaf-deep)"/><path d="M5 30 Q56 22 66 -12 Q24 -6 5 30Z" fill="var(--leaf)"/><path d="M-5 36 Q-58 26 -68 -2 Q-26 -2 -5 36Z" fill="#5FB873"/><path d="M6 14 Q44 0 46 -34 Q14 -22 6 14Z" fill="#6DC17F"/><path d="M-6 18 Q-42 4 -44 -30 Q-14 -20 -6 18Z" fill="#57B36D"/><circle cx="0" cy="-24" r="34" fill="#9BDDA5"/><g transform="translate(0,-22)">${face}</g><g transform="translate(20,-52)"><circle r="7" fill="var(--sun)"/><circle r="3" fill="#fff"/><g fill="var(--sun)"><rect x="-1.4" y="-13" width="2.8" height="6" rx="1.4"/><rect x="-1.4" y="7" width="2.8" height="6" rx="1.4"/><rect x="7" y="-1.4" width="6" height="2.8" rx="1.4"/><rect x="-13" y="-1.4" width="6" height="2.8" rx="1.4"/></g></g></g>`;
+  return `<svg width="${size}" height="${size}" viewBox="-90 -80 180 160" xmlns="http://www.w3.org/2000/svg">${b}</svg>`;
+}
+
+/* ===== 화면 ===== */
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('on'));$(id).classList.add('on');}
+
+/* ===== 메인(대화) ===== */
+function paintMe(){
+  const lv='Lv.'+state.me.level;
+  $('meLv').textContent=lv; $('meLv2').textContent=lv;
+  $('meNick').textContent=state.user.nick; $('meNick2').textContent=state.user.nick;
+  $('meR').textContent=state.user.nick.slice(0,1)||'나';
+  $('jaramiSpot').innerHTML=jaramiSVG(112); $('jaramiTag').textContent=state.user.jarami;
+}
+function paintScene(){
+  const p=activePet();
+  if(!p){
+    $('petSpot').innerHTML=`<div class="empty-plot"><div class="dash">🌱</div><div class="cap">가르치면 여기<br>펫이 생겨요</div></div>`;
+  }else{
+    const leaves=NODE_ORDER.map((id,i)=>`<div class="lf ${p.mastered.includes(id)?'on':''}"><b>${p.mastered.includes(id)?'✓':i+1}</b></div>`).join('');
+    $('petSpot').innerHTML=`<div class="pet-spot" id="petAnim">${petSVG(p.stage,142)}</div><div class="pet-tag">${p.topic}</div><div class="petleaves">${leaves}</div>`;
+  }
+}
+function startChatFresh(){ state.activePetId=null; $('talk').innerHTML=''; paintMe(); paintScene(); show('chat');
+  say(`${state.user.nick}아, 반가워! 오늘은 무엇을 배웠는지 나한테 알려줄 수 있을까? 🌱`);
+  setTimeout(()=>say('아는 만큼 편하게 말해줘. 아래 예시를 눌러도 좋아!'),650);
+}
+function resumePet(id){ state.activePetId=id; const p=activePet(); $('talk').innerHTML=''; paintMe(); paintScene(); show('chat');
+  state.expectedNode=NODE_ORDER.find(n=>!p.mastered.includes(n))||'def';
+  say(`${p.topic} 펫이 너를 기다렸어! 오늘은 뭘 더 알려줄래? 😊`);
+}
+function say(t,cls=''){const b=document.createElement('div');b.className='bubble '+cls;b.innerHTML=t;$('talk').appendChild(b);$('talk').scrollTop=$('talk').scrollHeight;return b;}
+function setStatus(t){$('status').textContent=t;}
+
+$('toFarm').onclick=()=>{renderFarm();show('farm');};
+$('toChat').onclick=()=>{ if(activePet()){paintScene();show('chat');} else startChatFresh(); };
+
+/* ===== 농장 ===== */
+function renderFarm(){
+  $('meLv2').textContent='Lv.'+state.me.level;
+  if(!state.pets.length){
+    $('plots').innerHTML=`<div class="empty-farm">아직 펫이 없어요.<br>자라미에게 배운 걸 알려주면<br>첫 펫이 태어나요! 🌱</div>
+      <div class="plot add" id="addPlot"><div class="plus">＋</div><div class="t">자라미에게<br>알려주러 가기</div></div>`;
+  }else{
+    $('plots').innerHTML=state.pets.map(p=>{
+      const lvl=STAGES.indexOf(p.stage)+1;
+      const dots=STAGES.map((s,i)=>`<i class="${i<lvl?'on':''}"></i>`).join('');
+      return `<div class="plot" data-id="${p.id}"><div class="fieldtag">${p.field}</div><div class="petbox">${petSVG(p.stage,90)}</div><div class="topic">${p.topic}</div><div class="st">${STAGE_KR[p.stage]} 단계</div><div class="prog">${dots}</div><div class="soil"></div></div>`;
+    }).join('')+`<div class="plot add" id="addPlot"><div class="plus">＋</div><div class="t">새로 배운 것<br>알려주기</div></div>`;
+  }
+  $('plots').querySelectorAll('.plot[data-id]').forEach(el=>el.onclick=()=>resumePet(el.dataset.id));
+  const add=$('addPlot'); if(add)add.onclick=startChatFresh;
+}
+
+/* ===== 평가 (더미 데이터 기반 로컬 평가) ===== */
+function evaluateLocal(text){
+  const p=activePet(); const mastered=p?p.mastered:[];
+  const found=NODE_ORDER.filter(id=>!mastered.includes(id)&&NODES[id].keywords.some(k=>text.includes(k)));
+  const tooShort=text.replace(/\s/g,'').length<4; let obj;
+  if(found.length){
+    const after=[...mastered,...found]; const nextId=NODE_ORDER.find(id=>!after.includes(id));
+    obj={is_on_topic:true,accuracy:'correct',mastered_nodes:found,feedback:NODES[found[0]].cheer,follow_up_question:nextId?NODES[found[found.length-1]].followup:'이제 너 광합성 박사다! 또 알려줄 거 있어?',needs_help:false,suggested_hint_card:null};
+  }else{
+    const expect=state.expectedNode;
+    obj={is_on_topic:true,accuracy:'incorrect',mastered_nodes:[],feedback:tooShort?'음… 조금만 더 자세히 알려줄래?':'오잉, 잘 모르겠어. 우리 같이 찾아볼까?',follow_up_question:NODES[expect]?NODES[expect].followup:'다시 한 번 알려줄래?',needs_help:true,suggested_hint_card:expect};
+  }
+  return {result:obj,source:'💾 더미 데이터 평가'};
+}
+async function evaluate(text){ return evaluateLocal(text); }
+
+/* ===== 진행 ===== */
+async function teachAction(){
+  const text=$('input').value.trim(); if(!text||state.busy)return;
+  state.busy=true;$('send').disabled=true;
+  say(text,'me');$('input').value='';$('input').style.height='46px';
+  const thinking=say('<span class="dots"><b>●</b> <b>●</b> <b>●</b></span> 골똘히 생각 중…','think');
+  setStatus('자라미가 생각하고 있어요…');$('jaramiSpot').classList.add('think');
+  const {result,source}=await evaluate(text);
+  thinking.remove();$('jaramiSpot').classList.remove('think');setStatus(source);
+  await applyResult(result);
+  state.busy=false;$('send').disabled=false;
+}
+async function applyResult(r){
+  if(r.is_on_topic===false){say('오, 그것도 궁금하다! 근데 지금은 잘 모르겠어. 방금 배운 거 다시 들려줄래? 🌱');return;}
+  say(r.feedback||'오, 그렇구나!');
+  let p=activePet();
+  const mastered=p?p.mastered:[];
+  const newNodes=(r.mastered_nodes||[]).filter(id=>NODES[id]&&!mastered.includes(id));
+
+  if(!p && newNodes.length){
+    p=state.pets.find(x=>x.topic==='광합성');
+    if(!p){p={id:'p'+Date.now(),topic:'광합성',field:'과학',stage:'seed',mastered:[],vocab:[]};state.pets.push(p);}
+    state.activePetId=p.id;
+    await birthPet();
+  }
+
+  if(newNodes.length && p){
+    newNodes.forEach(id=>{p.mastered.push(id);NODES[id].words.forEach(w=>{if(!p.vocab.includes(w))p.vocab.push(w);});});
+    state.me.xp+=newNodes.length; state.me.level=1+Math.floor(state.me.xp/3);
+    paintMe(); paintScene();
+    const before=p.stage, target=computeStage(p);
+    if(STAGES.indexOf(target)>STAGES.indexOf(before)) await playEvolution(p,target);
+  }
+
+  if(r.needs_help&&r.suggested_hint_card&&HINTS[r.suggested_hint_card]){setTimeout(()=>showHint(r.suggested_hint_card),350);state.expectedNode=r.suggested_hint_card;}
+  if(r.follow_up_question){
+    setTimeout(()=>{
+      say('<span class="q">'+r.follow_up_question+'</span>');
+      if(p&&p.vocab.length>=2&&Math.random()<.5&&!r.needs_help){const w=p.vocab[p.vocab.length-1];setTimeout(()=>say(`봐봐, ${p.topic} 펫이 <b style="color:var(--sun-deep)">${w}</b>를 기억했나 봐! 이거 네가 가르쳐 준 거야 😊`),450);}
+      if(p)state.expectedNode=NODE_ORDER.find(id=>!p.mastered.includes(id))||state.expectedNode;
+    },350);
+  }
+  if(p&&p.mastered.length===NODE_ORDER.length){setTimeout(()=>{const f=document.createElement('div');f.className='fin';f.textContent=`🎉 ${p.topic} 마스터! 펫이 다 자랐어요`;$('talk').appendChild(f);$('talk').scrollTop=$('talk').scrollHeight;},900);}
+}
+function computeStage(p){const m=p.mastered;let s='seed';if(m.includes('def'))s='sprout';const mid=['place','material','product'].filter(x=>m.includes(x)).length;if(mid>=2)s='seedling';if(m.includes('night'))s='leafy';return s;}
+
+function birthPet(){
+  return new Promise(resolve=>{
+    paintScene();
+    const anim=$('petAnim'); if(anim)anim.classList.add('spawn');
+    say('🌱 새로운 펫이 태어났어요!','born');
+    setTimeout(()=>say(`봐봐! 네가 알려준 걸로 작은 <b style="color:var(--leaf-deep)">광합성</b> 씨앗이 생겼어! 🌱`),300);
+    setTimeout(resolve,1100);
+  });
+}
+function playEvolution(p,target){
+  return new Promise(resolve=>{
+    p.stage=target; paintScene();
+    $('evoCreature').innerHTML=petSVG(target,190);
+    $('evoWord').textContent = target==='leafy'?'완성!':'진화!';
+    $('evoSub').textContent = target==='leafy'?`${p.topic} 펫이 다 컸어! 다 네 덕분이야 💚`:`${STAGE_KR[target]} 단계로 진화!`;
+    $('rays').innerHTML=Array.from({length:8}).map((_,i)=>`<div class="ray" style="transform:translate(-50%,0) rotate(${i*45}deg)"></div>`).join('');
+    const evo=$('evo');evo.classList.add('show');
+    for(let i=0;i<14;i++){const s=document.createElement('div');s.className='spark';s.style.left=(35+Math.random()*30)+'%';s.style.top=(40+Math.random()*25)+'%';s.style.animationDelay=(Math.random()*.5)+'s';evo.appendChild(s);}
+    setStatus('✨ 진화!');
+    setTimeout(()=>{evo.classList.remove('show');evo.querySelectorAll('.spark').forEach(s=>s.remove());paintScene();resolve();},2300);
+  });
+}
+function showHint(id){const h=HINTS[id];$('hintEmo').textContent=h.emo;$('hintTitle').textContent=h.title;$('hintText').textContent=h.text;$('overlay').classList.add('show');}
+$('hintClose').onclick=()=>{$('overlay').classList.remove('show');say('좋아, 이제 알 것 같아! 다시 알려줄래? 😃');$('input').focus();};
+
+/* ===== 데모 대본 (더미 데이터) ===== */
+const DEMO=[['광합성은 식물이 빛으로 양분을 만드는 거야','정의'],['잎에 있는 엽록체에서 일어나','장소'],['물이랑 이산화탄소가 필요해','재료'],['포도당이랑 산소가 만들어져','결과'],['밤엔 광합성을 못 하고 대신 숨을 쉬어(호흡)','밤'],['식물이 산소를 줘서 먹이사슬의 시작이야','의미']];
+$('chips').innerHTML=DEMO.map((d,i)=>`<button class="chip" data-i="${i}">${d[0]} <span class="k">· ${d[1]}</span></button>`).join('');
+$('chips').querySelectorAll('.chip').forEach(c=>c.onclick=()=>{$('input').value=DEMO[c.dataset.i][0];$('input').focus();});
+
+/* ===== 이벤트 ===== */
+$('send').onclick=teachAction;
+$('input').addEventListener('keydown',e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();teachAction();}});
+$('input').addEventListener('input',e=>{e.target.style.height='46px';e.target.style.height=Math.min(e.target.scrollHeight,110)+'px';});
+
+/* ===== 시작: 온보딩 없이 바로 대화 화면 ===== */
+startChatFresh();
+</script>
+</body>
+</html>

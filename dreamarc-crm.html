@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>DreamArc CRM — 기관 관리</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Jua&family=Gaegu:wght@400;700&family=Gowun+Dodum&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-top:#EAF0F8; --bg-bot:#F6F3EC;
+    --ink:#26314A; --muted:#79839C; --line:#E4E8F0;
+    --leaf:#45A05F; --leaf-deep:#2E7A45; --leaf-soft:#CFEBD3;
+    --sun:#F5B740; --sun-deep:#E39412; --sun-soft:#FCEBC2;
+    --card:#FFFFFF; --brand:#4E5FD6; --brand-deep:#37409E; --brand-soft:#E1E4FB;
+    --danger:#E2745B; --danger-soft:#FBE3DC;
+    --shadow:0 10px 28px rgba(38,49,74,.08);
+    --disp:'Jua',sans-serif; --hand:'Gaegu',cursive; --body:'Gowun Dodum',sans-serif;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:var(--body); color:var(--ink); background:linear-gradient(170deg,var(--bg-top),var(--bg-bot)); min-height:100vh; -webkit-font-smoothing:antialiased;}
+  .app{display:flex; min-height:100vh;}
+
+  .side{width:230px; flex:0 0 230px; background:linear-gradient(175deg,#2C3450,#1D2338); color:#fff; padding:26px 18px; display:flex; flex-direction:column; gap:4px;}
+  .side .logo{font-family:var(--disp); font-size:19px; margin-bottom:2px; display:flex; align-items:center; gap:8px;}
+  .side .sub{font-size:11px; color:#9AA3C4; margin-bottom:26px;}
+  .side a{display:flex; align-items:center; gap:10px; padding:11px 12px; border-radius:12px; color:#D6DAF0; text-decoration:none; font-size:14px; transition:.15s;}
+  .side a:hover{background:rgba(255,255,255,.08);}
+  .side a.on{background:var(--brand); color:#fff; font-family:var(--disp); box-shadow:0 6px 16px rgba(78,95,214,.4);}
+  .side .spacer{flex:1;}
+  .side .foot{font-size:11px; color:#7E88AE; border-top:1px solid rgba(255,255,255,.12); padding-top:14px;}
+
+  main{flex:1; padding:30px 38px;}
+  .topline{display:flex; align-items:center; justify-content:space-between; margin-bottom:22px;}
+  .topline h1{font-family:var(--disp); font-size:24px;}
+  .topline .tag{font-size:12px; color:var(--muted); margin-top:3px;}
+  .who{display:flex; align-items:center; gap:9px; background:var(--card); border:1px solid var(--line); border-radius:100px; padding:6px 14px 6px 6px; box-shadow:var(--shadow);}
+  .who .r{width:30px;height:30px;border-radius:50%; background:linear-gradient(160deg,var(--brand),var(--brand-deep)); display:grid; place-items:center; color:#fff; font-family:var(--disp); font-size:13px;}
+  .who .t small{display:block; font-size:10px; color:var(--muted);}
+  .who .t b{font-size:13px;}
+
+  .stats{display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:26px;}
+  .stat{background:var(--card); border:1px solid var(--line); border-radius:18px; padding:16px 18px; box-shadow:var(--shadow);}
+  .stat .l{font-size:12px; color:var(--muted);}
+  .stat .v{font-family:var(--disp); font-size:26px; margin-top:4px;}
+  .stat .v.brand{color:var(--brand-deep);} .stat .v.leaf{color:var(--leaf-deep);} .stat .v.sun{color:var(--sun-deep);}
+  .stat .d{font-size:11px; color:var(--muted); margin-top:2px;}
+
+  .grid2{display:grid; grid-template-columns:1.4fr 1fr; gap:18px; align-items:start;}
+  .panel{background:var(--card); border:1px solid var(--line); border-radius:20px; padding:20px 22px; box-shadow:var(--shadow); margin-bottom:18px;}
+  .panel h2{font-family:var(--disp); font-size:16px; margin-bottom:14px; display:flex; align-items:center; gap:7px;}
+  .panel h2 span.small{font-family:var(--body); font-size:11px; color:var(--muted); font-weight:normal; margin-left:auto;}
+
+  table{width:100%; border-collapse:collapse; font-size:13px;}
+  th{text-align:left; color:var(--muted); font-weight:normal; font-size:11px; padding:6px 8px; border-bottom:1px solid var(--line);}
+  td{padding:11px 8px; border-bottom:1px solid #F1F3F8; vertical-align:middle;}
+  tr:last-child td{border-bottom:none;}
+  .org-name{font-family:var(--disp); font-size:13px;}
+  .org-sub{font-size:11px; color:var(--muted);}
+  .pill{display:inline-block; font-size:11px; padding:3px 10px; border-radius:100px; font-family:var(--disp);}
+  .pill.biz{background:var(--brand-soft); color:var(--brand-deep);}
+  .pill.personal{background:var(--sun-soft); color:var(--sun-deep);}
+  .pill.trial{background:#EEF0F5; color:var(--muted);}
+  .dotstat{display:flex; align-items:center; gap:6px; font-size:12px;}
+  .dotstat i{width:8px;height:8px;border-radius:50%;}
+  .dotstat.up i{background:var(--leaf);} .dotstat.down i{background:var(--danger);}
+
+  .planbars{display:flex; flex-direction:column; gap:12px;}
+  .planbar .top{display:flex; justify-content:space-between; font-size:12px; margin-bottom:6px;}
+  .planbar .top b{font-family:var(--disp); font-size:13px;}
+  .track{height:10px; background:#EEF0F5; border-radius:100px; overflow:hidden;}
+  .track i{display:block; height:100%; border-radius:100px;}
+  .track.biz i{background:linear-gradient(90deg,var(--brand),var(--brand-deep)); width:38%;}
+  .track.personal i{background:linear-gradient(90deg,var(--sun),var(--sun-deep)); width:34%;}
+  .track.trial i{background:linear-gradient(90deg,#C7CCDA,#9AA3C4); width:28%;}
+
+  .active-list{display:flex; flex-direction:column; gap:10px;}
+  .arow{display:flex; align-items:center; gap:10px; font-size:12px;}
+  .arow .name{flex:1; font-family:var(--disp); font-size:13px;}
+  .arow .gauge{width:90px;}
+
+  .note{margin-top:14px; background:var(--brand-soft); border-radius:14px; padding:12px 14px; font-size:12px; color:var(--brand-deep); line-height:1.6;}
+  .note b{font-family:var(--disp); font-size:12px;}
+
+  @media (max-width:980px){ .grid2{grid-template-columns:1fr;} .stats{grid-template-columns:repeat(2,1fr);} .side{display:none;} }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <aside class="side">
+    <div class="logo">🏛️ DreamArc CRM</div>
+    <div class="sub">운영팀 전용</div>
+    <a class="on" href="#">📈 대시보드</a>
+    <a href="#">🏫 가입 기관</a>
+    <a href="#">💳 요금제</a>
+    <a href="#">⚙️ 설정</a>
+    <div class="spacer"></div>
+    <div class="foot">DreamArc · 2026 K-Hackathon</div>
+  </aside>
+
+  <main>
+    <div class="topline">
+      <div>
+        <h1>DreamArc 운영 대시보드</h1>
+        <div class="tag">가입 기관과 요금제 현황을 한눈에 확인하세요.</div>
+      </div>
+      <div class="who">
+        <div class="r">운</div>
+        <div class="t"><small>DreamArc</small><b>운영자</b></div>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><div class="l">가입 기관 수</div><div class="v brand">12곳</div><div class="d">이번 달 +3곳</div></div>
+      <div class="stat"><div class="l">비즈니스 요금제</div><div class="v leaf">5곳</div><div class="d">MRR 기여 62%</div></div>
+      <div class="stat"><div class="l">전체 활성 유저</div><div class="v sun">318명</div><div class="d">주간 활성 74%</div></div>
+      <div class="stat"><div class="l">평균 활성도</div><div class="v brand">82점</div><div class="d">지난 주 대비 +4점</div></div>
+    </div>
+
+    <div class="grid2">
+      <div>
+        <div class="panel">
+          <h2>🏫 가입 기관 목록 <span class="small">활성도 순</span></h2>
+          <table>
+            <tr><th>기관명</th><th>담당자</th><th>요금제</th><th>원생 수</th><th>활성도</th></tr>
+            <tr><td><div class="org-name">초록빛 지역아동센터</div><div class="org-sub">서울 은평구</div></td><td>김담당</td><td><span class="pill biz">비즈니스</span></td><td>24명</td><td><span class="dotstat up"><i></i>92점</span></td></tr>
+            <tr><td><div class="org-name">햇살교육 공부방</div><div class="org-sub">경기 수원시</div></td><td>박선생</td><td><span class="pill biz">비즈니스</span></td><td>18명</td><td><span class="dotstat up"><i></i>88점</span></td></tr>
+            <tr><td><div class="org-name">푸른숲 지역아동센터</div><div class="org-sub">인천 부평구</div></td><td>이센터장</td><td><span class="pill biz">비즈니스</span></td><td>31명</td><td><span class="dotstat up"><i></i>85점</span></td></tr>
+            <tr><td><div class="org-name">별빛 방과후교실</div><div class="org-sub">대전 유성구</div></td><td>최쌤</td><td><span class="pill personal">개인</span></td><td>6명</td><td><span class="dotstat down"><i></i>61점</span></td></tr>
+            <tr><td><div class="org-name">늘봄 어린이집 연계반</div><div class="org-sub">부산 해운대구</div></td><td>정원장</td><td><span class="pill trial">체험판</span></td><td>4명</td><td><span class="dotstat down"><i></i>48점</span></td></tr>
+          </table>
+        </div>
+      </div>
+
+      <div>
+        <div class="panel">
+          <h2>💳 요금제 분포</h2>
+          <div class="planbars">
+            <div class="planbar"><div class="top"><b>비즈니스</b><span>5곳 · 38%</span></div><div class="track biz"><i></i></div></div>
+            <div class="planbar"><div class="top"><b>개인</b><span>4곳 · 34%</span></div><div class="track personal"><i></i></div></div>
+            <div class="planbar"><div class="top"><b>체험판</b><span>3곳 · 28%</span></div><div class="track trial"><i></i></div></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h2>📊 기관 활성도</h2>
+          <div class="active-list">
+            <div class="arow"><span class="name">초록빛 지역아동센터</span><div class="gauge track biz" style="width:90px"><i style="width:92%"></i></div>92</div>
+            <div class="arow"><span class="name">햇살교육 공부방</span><div class="gauge track biz" style="width:90px"><i style="width:88%"></i></div>88</div>
+            <div class="arow"><span class="name">푸른숲 지역아동센터</span><div class="gauge track biz" style="width:90px"><i style="width:85%"></i></div>85</div>
+            <div class="arow"><span class="name">별빛 방과후교실</span><div class="gauge track trial" style="width:90px"><i style="width:61%;background:linear-gradient(90deg,var(--sun),var(--sun-deep))"></i></div>61</div>
+            <div class="arow"><span class="name">늘봄 어린이집 연계반</span><div class="gauge track trial" style="width:90px"><i style="width:48%"></i></div>48</div>
+          </div>
+          <div class="note"><b>💡 인사이트</b><br>비즈니스 요금제 기관의 평균 활성도(88점)가 체험판(54점) 대비 크게 높습니다 — 그룹 분류 대시보드 도입 기관일수록 재방문율이 높은 경향이 보입니다.</div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>
