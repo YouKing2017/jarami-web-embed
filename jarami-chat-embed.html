@@ -332,6 +332,10 @@ function evaluateLocal(text){
   obj.used_fallback=true;
   return obj;
 }
+function parsedStudentGrade(){
+  const n=parseInt(state.user.grade,10);
+  return (Number.isInteger(n)&&n>=1&&n<=6)?n:null;
+}
 async function evaluateOnServer(text){
   const p=activePet();
   const body={
@@ -343,7 +347,8 @@ async function evaluateOnServer(text){
     student_utterance:text,
     mastered_nodes:p?p.mastered:[],
     last_zarami_reply:state.session.lastZaramiReply||null,
-    consecutive_needs_help:state.session.consecutiveNeedsHelp
+    consecutive_needs_help:state.session.consecutiveNeedsHelp,
+    student_grade:parsedStudentGrade()
   };
   const controller=new AbortController();
   const timer=setTimeout(()=>controller.abort(),SERVER_CONFIG.timeoutMs);
