@@ -179,36 +179,36 @@
    예: jarami-chat-embed.html?jarami=자라미&nick=도윤&grade=초4 */
 const params=new URLSearchParams(location.search);
 
-/* ===== 지식 조각 (광합성) ===== */
+/* ===== 지식 조각 (광합성) — 노드 ID는 B의 서버(server/data/nodes.json)와 동일 ===== */
 const NODES={
-  def:{concept:'식물이 빛으로 양분을 만든다',keywords:['광합성','양분','빛으로','만들','밥'],followup:'그 빛은 식물의 어디로 들어가는 거야?',words:['광합성'],cheer:'우와! 식물이 빛으로 밥을 만든다는 거지? 완전 신기해!'},
-  light:{concept:'빛이 에너지원',keywords:['빛','햇빛','에너지','태양'],followup:'빛이 없으면 어떻게 될까?',words:['햇빛'],cheer:'아하, 빛이 힘의 원천이구나!'},
-  place:{concept:'잎의 엽록체에서 일어남',keywords:['엽록체','엽록소','잎'],followup:'양분을 만들려면 빛 말고 또 뭐가 필요해?',words:['엽록체'],cheer:'엽록체! 그 어려운 말을 알려주다니, 고마워!'},
-  material:{concept:'재료는 물 + 이산화탄소',keywords:['물','이산화탄소'],followup:'그렇게 해서 뭐가 만들어져?',words:['이산화탄소'],cheer:'물이랑 이산화탄소가 재료구나!'},
-  product:{concept:'결과물은 포도당 + 산소',keywords:['포도당','산소'],followup:'그럼… 밤에는 어떻게 돼? 깜깜하면 양분 못 만들잖아?',words:['포도당','산소'],cheer:'포도당이랑 산소가 나오는구나! 대박!'},
-  night:{concept:'밤엔 광합성 X, 대신 호흡',keywords:['밤','호흡','숨','못'],followup:'이게 우리한테 왜 중요할까?',words:['호흡'],cheer:'밤엔 숨을 쉰다고?! 나 이제 진짜 다 알 것 같아!'},
+  def:{concept:'식물이 빛으로 양분을 만든다',keywords:['광합성','양분','빛으로','만들','밥'],followup:'그 빛은 어디서 흡수되는 걸까?',words:['광합성'],cheer:'우와! 식물이 빛으로 밥을 만든다는 거지? 완전 신기해!'},
+  light_absorption:{concept:'빛은 엽록체에서 흡수됨',keywords:['빛','햇빛','엽록체','엽록소'],followup:'그 과정에 물이랑 이산화탄소도 필요할까?',words:['엽록체'],cheer:'엽록체에서 빛을 흡수하는구나! 신기하다~'},
+  reactants:{concept:'재료는 물 + 이산화탄소',keywords:['물','이산화탄소'],followup:'그렇게 해서 뭐가 만들어져?',words:['이산화탄소'],cheer:'물이랑 이산화탄소가 재료구나!'},
+  products:{concept:'결과물은 포도당 + 산소',keywords:['포도당','산소'],followup:'이게 잎의 어디서 일어나는지도 알아?',words:['포도당','산소'],cheer:'포도당이랑 산소가 나오는구나! 대박!'},
+  location:{concept:'잎에서 일어남',keywords:['잎'],followup:'그럼… 밤에는 어떻게 될까? 깜깜하면 양분 못 만들잖아?',words:['잎'],cheer:'잎에서 일어나는 거구나!'},
+  day_night:{concept:'밤엔 광합성 X, 대신 호흡',keywords:['밤','호흡','숨','못'],followup:'이게 우리한테 왜 중요할까?',words:['호흡'],cheer:'밤엔 숨을 쉰다고?! 나 이제 진짜 다 알 것 같아!'},
   world:{concept:'산소 공급·먹이사슬 기초',keywords:['먹이사슬','산소','지구','생명'],followup:'이제 너 광합성 박사다! 또 알려줄 거 있어?',words:['먹이사슬'],cheer:'그게 그렇게 소중한 거였어?!'}
 };
 const NODE_ORDER=Object.keys(NODES);
 const HINTS={
   def:{emo:'☀️',title:'광합성이 뭐야?',text:'식물은 햇빛을 받아서 스스로 양분(밥)을 만들어요. 이걸 광합성이라고 불러요.'},
-  light:{emo:'💡',title:'빛의 역할',text:'광합성에는 빛 에너지가 꼭 필요해요. 빛이 없으면 양분을 만들 수 없어요.'},
-  place:{emo:'🍃',title:'어디서 일어날까?',text:'광합성은 잎 속의 "엽록체"라는 작고 초록색인 방에서 일어나요.'},
-  material:{emo:'💧',title:'무엇이 필요할까?',text:'재료는 뿌리로 빨아들인 "물"과, 잎으로 들어온 "이산화탄소"예요.'},
-  product:{emo:'🍬',title:'무엇이 만들어질까?',text:'광합성으로 "포도당"(양분)과 "산소"가 만들어져요. 산소는 공기 중으로 나가요.'},
-  night:{emo:'🌙',title:'낮과 밤의 식물',text:'낮엔 빛을 받아 광합성을 해요. 밤엔 빛이 없어 광합성을 못 하고, 대신 숨을 쉬어요(호흡).'},
+  light_absorption:{emo:'💡',title:'빛은 어디서 흡수될까?',text:'광합성은 잎 속의 "엽록체"라는 작고 초록색인 방에서 빛을 흡수해요.'},
+  reactants:{emo:'💧',title:'무엇이 필요할까?',text:'재료는 뿌리로 빨아들인 "물"과, 잎으로 들어온 "이산화탄소"예요.'},
+  products:{emo:'🍬',title:'무엇이 만들어질까?',text:'광합성으로 "포도당"(양분)과 "산소"가 만들어져요. 산소는 공기 중으로 나가요.'},
+  location:{emo:'🍃',title:'어디서 일어날까?',text:'광합성은 식물의 "잎"에서 일어나요.'},
+  day_night:{emo:'🌙',title:'낮과 밤의 식물',text:'낮엔 빛을 받아 광합성을 해요. 밤엔 빛이 없어 광합성을 못 하고, 대신 숨을 쉬어요(호흡).'},
   world:{emo:'🌍',title:'왜 중요할까?',text:'식물이 내놓는 산소로 우리가 숨 쉬고, 식물은 먹이사슬의 시작점이에요.'}
 };
-const STAGES=['seed','sprout','seedling','leafy'];
-const STAGE_KR={seed:'씨앗',sprout:'새싹',seedling:'잎이 돋은',leafy:'잎이 무성한'};
+const STAGES=['seed','sprout','leaf','full'];
+const STAGE_KR={seed:'씨앗',sprout:'새싹',leaf:'잎이 돋은',full:'잎이 무성한'};
 
-/* ===== API 설정 =====
-   api=1 로 열면 서버 프록시(/api/evaluate)를 통해 GPT 평가를 사용합니다.
-   API 키는 브라우저에 넣지 말고 server.mjs의 OPENAI_API_KEY 환경변수로만 전달하세요.
-*/
-const API_CONFIG={
-  enabled:['1','true','gpt'].includes((params.get('api')||'').toLowerCase()),
-  endpoint:params.get('apiEndpoint')||'/api/evaluate'
+/* ===== B 서버(FastAPI /evaluate) 연동 설정 =====
+   기본값은 로컬 개발 서버. 다른 주소(ngrok 등)를 쓰려면
+   jarami-chat-embed.html?api=https://xxxx.ngrok.app 형태로 덮어씁니다.
+   서버 호출이 실패하면(미기동/타임아웃 등) 로컬 더미 평가로 자동 대체합니다. */
+const SERVER_CONFIG={
+  base:(params.get('api')||'http://127.0.0.1:8000').replace(/\/$/,''),
+  timeoutMs:45000 // 체크리스트: 실측 최대 28초 → 여유있게 45초
 };
 
 /* ===== 상태 (온보딩 값은 URL 파라미터로 주입, 없으면 기본값) ===== */
@@ -221,7 +221,13 @@ const state={
   me:{level:1,xp:0},
   pets:[],            // 대화로 태어난 펫들 (농장 보관)
   activePetId:null,   // 지금 대화 중인 펫
-  expectedNode:'def', useAPI:API_CONFIG.enabled, busy:false
+  expectedNode:'def', busy:false,
+  session:{
+    id:'flexstudio-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,8),
+    turnIndex:0,
+    consecutiveNeedsHelp:0,
+    lastZaramiReply:''
+  }
 };
 const $=id=>document.getElementById(id);
 const activePet=()=>state.pets.find(p=>p.id===state.activePetId)||null;
@@ -235,7 +241,7 @@ function petSVG(stage,size=150){
   let b='';
   if(stage==='seed')b=`<g transform="translate(0,14)"><ellipse cx="0" cy="40" rx="34" ry="10" fill="rgba(46,72,45,.10)"/><path d="M0 -30 C26 -30 30 30 0 34 C-30 30 -26 -30 0 -30Z" fill="#C98B5A"/><path d="M0 -30 C18 -30 22 20 0 30 C-8 24 -12 -20 0 -30Z" fill="#E0A877"/><g transform="translate(0,-2)">${face}</g><path d="M0 -30 Q4 -44 12 -46" stroke="var(--leaf)" stroke-width="4" fill="none" stroke-linecap="round"/></g>`;
   else if(stage==='sprout')b=`<g transform="translate(0,10)"><ellipse cx="0" cy="46" rx="38" ry="11" fill="rgba(46,72,45,.10)"/><rect x="-4" y="6" width="8" height="34" rx="4" fill="var(--leaf-deep)"/><path d="M2 14 Q34 6 40 -18 Q14 -12 2 14Z" fill="var(--leaf)"/><path d="M-2 18 Q-32 12 -40 -10 Q-16 -8 -2 18Z" fill="#5FB873"/><circle cx="0" cy="-6" r="26" fill="#7FC98A"/><g transform="translate(0,-4)">${face}</g></g>`;
-  else if(stage==='seedling')b=`<g transform="translate(0,4)"><ellipse cx="0" cy="54" rx="44" ry="12" fill="rgba(46,72,45,.10)"/><rect x="-5" y="8" width="10" height="46" rx="5" fill="var(--leaf-deep)"/><path d="M4 24 Q44 16 52 -14 Q18 -8 4 24Z" fill="var(--leaf)"/><path d="M-4 30 Q-46 22 -54 -6 Q-22 -4 -4 30Z" fill="#5FB873"/><path d="M3 10 Q30 -6 30 -30 Q8 -20 3 10Z" fill="#6DC17F"/><circle cx="0" cy="-14" r="30" fill="#8FD69A"/><g transform="translate(0,-12)">${face}</g></g>`;
+  else if(stage==='leaf')b=`<g transform="translate(0,4)"><ellipse cx="0" cy="54" rx="44" ry="12" fill="rgba(46,72,45,.10)"/><rect x="-5" y="8" width="10" height="46" rx="5" fill="var(--leaf-deep)"/><path d="M4 24 Q44 16 52 -14 Q18 -8 4 24Z" fill="var(--leaf)"/><path d="M-4 30 Q-46 22 -54 -6 Q-22 -4 -4 30Z" fill="#5FB873"/><path d="M3 10 Q30 -6 30 -30 Q8 -20 3 10Z" fill="#6DC17F"/><circle cx="0" cy="-14" r="30" fill="#8FD69A"/><g transform="translate(0,-12)">${face}</g></g>`;
   else b=`<g transform="translate(0,0)"><ellipse cx="0" cy="60" rx="52" ry="13" fill="rgba(46,72,45,.10)"/><rect x="-6" y="6" width="12" height="56" rx="6" fill="var(--leaf-deep)"/><path d="M5 30 Q56 22 66 -12 Q24 -6 5 30Z" fill="var(--leaf)"/><path d="M-5 36 Q-58 26 -68 -2 Q-26 -2 -5 36Z" fill="#5FB873"/><path d="M6 14 Q44 0 46 -34 Q14 -22 6 14Z" fill="#6DC17F"/><path d="M-6 18 Q-42 4 -44 -30 Q-14 -20 -6 18Z" fill="#57B36D"/><circle cx="0" cy="-24" r="34" fill="#9BDDA5"/><g transform="translate(0,-22)">${face}</g><g transform="translate(20,-52)"><circle r="7" fill="var(--sun)"/><circle r="3" fill="#fff"/><g fill="var(--sun)"><rect x="-1.4" y="-13" width="2.8" height="6" rx="1.4"/><rect x="-1.4" y="7" width="2.8" height="6" rx="1.4"/><rect x="7" y="-1.4" width="6" height="2.8" rx="1.4"/><rect x="-13" y="-1.4" width="6" height="2.8" rx="1.4"/></g></g></g>`;
   return `<svg width="${size}" height="${size}" viewBox="-90 -80 180 160" xmlns="http://www.w3.org/2000/svg">${b}</svg>`;
 }
@@ -292,60 +298,83 @@ function renderFarm(){
 }
 
 /* ===== 평가 ===== */
+function computeStage(masteredNodes){
+  const count=masteredNodes.length;
+  if(count<=0)return 'seed';
+  if(count<=2)return 'sprout';
+  if(count<=5)return 'leaf';
+  return 'full';
+}
+/* B 서버가 응답 안 할 때(미기동/타임아웃/네트워크 오류)의 로컬 더미 폴백.
+   EvaluateResponse와 동일한 필드 모양을 맞춰서 applyResult가 출처를 몰라도 되게 한다. */
 function evaluateLocal(text){
   const p=activePet(); const mastered=p?p.mastered:[];
   const found=NODE_ORDER.filter(id=>!mastered.includes(id)&&NODES[id].keywords.some(k=>text.includes(k)));
   const tooShort=text.replace(/\s/g,'').length<4; let obj;
   if(found.length){
     const after=[...mastered,...found]; const nextId=NODE_ORDER.find(id=>!after.includes(id));
-    obj={is_on_topic:true,accuracy:'correct',mastered_nodes:found,feedback:NODES[found[0]].cheer,follow_up_question:nextId?NODES[found[found.length-1]].followup:'이제 너 광합성 박사다! 또 알려줄 거 있어?',needs_help:false,suggested_hint_card:null};
+    obj={
+      is_on_topic:true, newly_mastered_nodes:found, mastered_nodes:after,
+      zarami_reply:NODES[found[0]].cheer+' '+(nextId?NODES[found[found.length-1]].followup:'이제 너 광합성 박사다! 또 알려줄 거 있어?'),
+      needs_help:false, suggested_hint_card:null, consecutive_needs_help:0
+    };
   }else{
     const expect=state.expectedNode;
-    obj={is_on_topic:true,accuracy:'incorrect',mastered_nodes:[],feedback:tooShort?'음… 조금만 더 자세히 알려줄래?':'오잉, 잘 모르겠어. 우리 같이 찾아볼까?',follow_up_question:NODES[expect]?NODES[expect].followup:'다시 한 번 알려줄래?',needs_help:true,suggested_hint_card:expect};
+    // 서버(nodes.py)와 동일한 정책: needs_help면 무조건 +1 (힌트를 보여줘도 리셋 안 함),
+    // 2회 이상 누적이면 힌트 카드를 채운다.
+    const nextConsecutive=state.session.consecutiveNeedsHelp+1;
+    const showHintNow=nextConsecutive>=2;
+    obj={
+      is_on_topic:true, newly_mastered_nodes:[], mastered_nodes:mastered,
+      zarami_reply:tooShort?'음… 조금만 더 자세히 알려줄래?':'오잉, 잘 모르겠어. 우리 같이 찾아볼까?',
+      needs_help:true,
+      suggested_hint_card:showHintNow&&HINTS[expect]?{node_id:expect,hint_text:HINTS[expect].text}:null,
+      consecutive_needs_help:nextConsecutive
+    };
   }
-  return {result:obj,source:'💾 더미 데이터 평가'};
+  obj.pet_growth_stage=computeStage(obj.mastered_nodes);
+  obj.used_fallback=true;
+  return obj;
 }
-function normalizeEvaluation(value){
-  const fallback=evaluateLocal('').result;
-  const r=(value&&typeof value==='object')?value:{};
-  const mastered=Array.isArray(r.mastered_nodes)?r.mastered_nodes.filter(id=>NODES[id]):[];
-  const hint=NODES[r.suggested_hint_card]?r.suggested_hint_card:state.expectedNode;
-  return {
-    is_on_topic:r.is_on_topic!==false,
-    accuracy:['correct','partial','incorrect'].includes(r.accuracy)?r.accuracy:fallback.accuracy,
-    mastered_nodes:mastered,
-    feedback:typeof r.feedback==='string'&&r.feedback.trim()?r.feedback.trim():fallback.feedback,
-    follow_up_question:typeof r.follow_up_question==='string'?r.follow_up_question.trim():fallback.follow_up_question,
-    needs_help:Boolean(r.needs_help),
-    suggested_hint_card:hint
-  };
-}
-async function evaluateGPT(text){
+async function evaluateOnServer(text){
   const p=activePet();
-  const payload={
-    text,
-    user:state.user,
-    expectedNode:state.expectedNode,
-    masteredNodes:p?p.mastered:[],
-    nodes:Object.fromEntries(Object.entries(NODES).map(([id,n])=>[id,{concept:n.concept,keywords:n.keywords,followup:n.followup}]))
+  const body={
+    schema_version:'v1',
+    session_id:state.session.id,
+    student_id:state.user.nick||state.session.id,
+    topic:'photosynthesis',
+    turn_index:state.session.turnIndex,
+    student_utterance:text,
+    mastered_nodes:p?p.mastered:[],
+    last_zarami_reply:state.session.lastZaramiReply||null,
+    consecutive_needs_help:state.session.consecutiveNeedsHelp
   };
-  const response=await fetch(API_CONFIG.endpoint,{
-    method:'POST',
-    headers:{'Content-Type':'application/json'},
-    body:JSON.stringify(payload)
-  });
-  const data=await response.json().catch(()=>({}));
-  if(!response.ok)throw new Error(data.error||'GPT 평가 서버 응답 오류');
-  return {result:normalizeEvaluation(data.result),source:data.source||'🤖 GPT 평가'};
+  const controller=new AbortController();
+  const timer=setTimeout(()=>controller.abort(),SERVER_CONFIG.timeoutMs);
+  try{
+    const res=await fetch(SERVER_CONFIG.base+'/evaluate',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify(body),
+      signal:controller.signal
+    });
+    if(!res.ok){
+      const errBody=await res.json().catch(()=>({}));
+      throw new Error(errBody.detail?JSON.stringify(errBody.detail):('서버 응답 오류 '+res.status));
+    }
+    return await res.json();
+  } finally {
+    clearTimeout(timer);
+  }
 }
 async function evaluate(text){
-  if(!state.useAPI)return evaluateLocal(text);
   try{
-    return await evaluateGPT(text);
+    const data=await evaluateOnServer(text);
+    return {...data,source:data.used_fallback?'⚠️ 서버 폴백 모드':'🌐 B 서버 평가'};
   }catch(err){
-    console.warn(err);
+    console.warn('B 서버 호출 실패, 로컬 더미 평가로 대체:',err);
     const local=evaluateLocal(text);
-    return {...local,source:'⚠️ GPT 연결 실패 · 더미 평가 사용'};
+    return {...local,source:'💾 서버 연결 실패 · 더미 평가'};
   }
 }
 
@@ -356,17 +385,21 @@ async function teachAction(){
   say(text,'me');$('input').value='';$('input').style.height='46px';
   const thinking=say('<span class="dots"><b>●</b> <b>●</b> <b>●</b></span> 골똘히 생각 중…','think');
   setStatus('자라미가 생각하고 있어요…');$('jaramiSpot').classList.add('think');
-  const {result,source}=await evaluate(text);
+  const {source,...result}=await evaluate(text);
   thinking.remove();$('jaramiSpot').classList.remove('think');setStatus(source);
   await applyResult(result);
+  state.session.turnIndex+=1;
   state.busy=false;$('send').disabled=false;
 }
 async function applyResult(r){
+  // 다음 요청에 그대로 echo — 서버가 "같은 노드에서 연속 2회 막힘"을 판단하는 값
+  state.session.consecutiveNeedsHelp=r.consecutive_needs_help||0;
+  state.session.lastZaramiReply=r.zarami_reply||'';
+
   if(r.is_on_topic===false){say('오, 그것도 궁금하다! 근데 지금은 잘 모르겠어. 방금 배운 거 다시 들려줄래? 🌱');return;}
-  say(r.feedback||'오, 그렇구나!');
+
   let p=activePet();
-  const mastered=p?p.mastered:[];
-  const newNodes=(r.mastered_nodes||[]).filter(id=>NODES[id]&&!mastered.includes(id));
+  const newNodes=r.newly_mastered_nodes||[];
 
   if(!p && newNodes.length){
     p=state.pets.find(x=>x.topic==='광합성');
@@ -375,25 +408,28 @@ async function applyResult(r){
     await birthPet();
   }
 
-  if(newNodes.length && p){
-    newNodes.forEach(id=>{p.mastered.push(id);NODES[id].words.forEach(w=>{if(!p.vocab.includes(w))p.vocab.push(w);});});
-    state.me.xp+=newNodes.length; state.me.level=1+Math.floor(state.me.xp/3);
+  if(p){
+    p.mastered=r.mastered_nodes||p.mastered; // 서버가 주는 값이 항상 최종 정답
+    newNodes.forEach(id=>{if(NODES[id])NODES[id].words.forEach(w=>{if(!p.vocab.includes(w))p.vocab.push(w);});});
+    state.me.xp=p.mastered.length; state.me.level=1+Math.floor(state.me.xp/3);
     paintMe(); paintScene();
-    const before=p.stage, target=computeStage(p);
+    const before=p.stage, target=r.pet_growth_stage||computeStage(p.mastered);
     if(STAGES.indexOf(target)>STAGES.indexOf(before)) await playEvolution(p,target);
   }
 
-  if(r.needs_help&&r.suggested_hint_card&&HINTS[r.suggested_hint_card]){setTimeout(()=>showHint(r.suggested_hint_card),350);state.expectedNode=r.suggested_hint_card;}
-  if(r.follow_up_question){
-    setTimeout(()=>{
-      say('<span class="q">'+r.follow_up_question+'</span>');
-      if(p&&p.vocab.length>=2&&Math.random()<.5&&!r.needs_help){const w=p.vocab[p.vocab.length-1];setTimeout(()=>say(`봐봐, ${p.topic} 펫이 <b style="color:var(--sun-deep)">${w}</b>를 기억했나 봐! 이거 네가 가르쳐 준 거야 😊`),450);}
-      if(p)state.expectedNode=NODE_ORDER.find(id=>!p.mastered.includes(id))||state.expectedNode;
-    },350);
+  say(r.zarami_reply||'오, 그렇구나!');
+
+  if(r.needs_help&&r.suggested_hint_card){
+    const cardNodeId=r.suggested_hint_card.node_id;
+    const cardText=r.suggested_hint_card.hint_text||(HINTS[cardNodeId]&&HINTS[cardNodeId].text)||'';
+    setTimeout(()=>showHint(cardNodeId,cardText),450);
+    state.expectedNode=cardNodeId;
+  }else if(p){
+    state.expectedNode=NODE_ORDER.find(id=>!p.mastered.includes(id))||state.expectedNode;
   }
+
   if(p&&p.mastered.length===NODE_ORDER.length){setTimeout(()=>{const f=document.createElement('div');f.className='fin';f.textContent=`🎉 ${p.topic} 마스터! 펫이 다 자랐어요`;$('talk').appendChild(f);$('talk').scrollTop=$('talk').scrollHeight;},900);}
 }
-function computeStage(p){const m=p.mastered;let s='seed';if(m.includes('def'))s='sprout';const mid=['place','material','product'].filter(x=>m.includes(x)).length;if(mid>=2)s='seedling';if(m.includes('night'))s='leafy';return s;}
 
 function birthPet(){
   return new Promise(resolve=>{
@@ -408,8 +444,8 @@ function playEvolution(p,target){
   return new Promise(resolve=>{
     p.stage=target; paintScene();
     $('evoCreature').innerHTML=petSVG(target,190);
-    $('evoWord').textContent = target==='leafy'?'완성!':'진화!';
-    $('evoSub').textContent = target==='leafy'?`${p.topic} 펫이 다 컸어! 다 네 덕분이야 💚`:`${STAGE_KR[target]} 단계로 진화!`;
+    $('evoWord').textContent = target==='full'?'완성!':'진화!';
+    $('evoSub').textContent = target==='full'?`${p.topic} 펫이 다 컸어! 다 네 덕분이야 💚`:`${STAGE_KR[target]} 단계로 진화!`;
     $('rays').innerHTML=Array.from({length:8}).map((_,i)=>`<div class="ray" style="transform:translate(-50%,0) rotate(${i*45}deg)"></div>`).join('');
     const evo=$('evo');evo.classList.add('show');
     for(let i=0;i<14;i++){const s=document.createElement('div');s.className='spark';s.style.left=(35+Math.random()*30)+'%';s.style.top=(40+Math.random()*25)+'%';s.style.animationDelay=(Math.random()*.5)+'s';evo.appendChild(s);}
@@ -417,7 +453,11 @@ function playEvolution(p,target){
     setTimeout(()=>{evo.classList.remove('show');evo.querySelectorAll('.spark').forEach(s=>s.remove());paintScene();resolve();},2300);
   });
 }
-function showHint(id){const h=HINTS[id];$('hintEmo').textContent=h.emo;$('hintTitle').textContent=h.title;$('hintText').textContent=h.text;$('overlay').classList.add('show');}
+function showHint(id,text){
+  const h=HINTS[id]||{emo:'💡',title:'힌트'};
+  $('hintEmo').textContent=h.emo;$('hintTitle').textContent=h.title;$('hintText').textContent=text||h.text||'';
+  $('overlay').classList.add('show');
+}
 $('hintClose').onclick=()=>{$('overlay').classList.remove('show');say('좋아, 이제 알 것 같아! 다시 알려줄래? 😃');$('input').focus();};
 
 /* ===== 데모 대본 (더미 데이터) ===== */
@@ -432,7 +472,6 @@ $('input').addEventListener('input',e=>{e.target.style.height='46px';e.target.st
 
 /* ===== 시작: 온보딩 없이 바로 대화 화면 ===== */
 startChatFresh();
-setStatus(state.useAPI?'GPT 평가 모드예요':'준비됐어요');
 </script>
 </body>
 </html>
